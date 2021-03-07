@@ -2,17 +2,18 @@
 title: 'Task 3: Bootstrapping'
 author: "Kirsten Hodgson"
 date: "3/7/2021"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(boot)
 ```
 
-### Data preparation (vector creation)
 
 ```{r}
 survey <- c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
@@ -22,5 +23,23 @@ proportion_fun <- function(x,i) {sum(x[i]/length(x[i]))}
 
 #sum(survey/length(survey))
 #proportion_fun(test)
+
+#Create 10k bootstrap samples from survey
+surveyboot_10k <- boot(survey,
+                       statistic = proportion_fun,
+                       R = 10000)
+
+surveyboot_10k
+#surveyboot_10k$t0
+#surveyboot_10k$t
+
+surveyboot_10k_df <- data.frame(bs_prop = surveyboot_10k$t)
+
+ggplot(data = surveyboot_10k_df, aes(x = bs_prop)) +
+  geom_histogram(bins = 25)
+
+#Find 95% CI
+boot.ci(surveyboot_10k, conf = 0.95)
 ```
 
+The proportion of nonbinary/genderqueer UCSB students experiencing exclusionary, hostile,  or intimidating conduct is .61 (n = 36), with a bootstrapped 95% confidence interval of [0.4522, 0.7696] (n = 10,000 bootstrap samples).
