@@ -16,7 +16,6 @@ library(janitor)
 library(NbClust)
 library(cluster)
 library(factoextra)
-library(dendextend)
 library(ggdendro)
 
 stream_chem <- read_csv(here("data", "sbc_lter_registered_stream_chemistry.csv"))
@@ -25,7 +24,7 @@ stream_chem_clean <- stream_chem %>%
   clean_names() %>%
   na_if(-999)
 
-stream_summary <- stream_chem_clean %>% 
+stream_chem_summary <- stream_chem_clean %>% 
   group_by(site_code) %>% 
   summarize(mean_nh4 = mean(nh4_u_m, na.rm = T), 
             mean_no3 = mean(no3_u_m, na.rm = T),
@@ -40,3 +39,45 @@ stream_summary <- stream_chem_clean %>%
   drop_na()
 ```
 
+### 1. Scale the data
+
+```{r}
+#Scale the numeric variables (columns 2-11)
+chem_scaled <- stream_chem_summary %>% 
+  select(2:11) %>% 
+  scale
+#Add the rownames from the data frame to the vector
+rownames(chem_scaled) <- stream_chem_summary$site_code
+
+#View(chem_scaled)
+```
+
+### 2. Find Euclidean distances
+
+```{r}
+#Compute Euclidean distances
+chem_euc_dist <- dist(chem_scaled, method = "euclidean")
+
+#View(chem_euc_dist)
+```
+
+### 3. Perform agglomerative hierarchical clustering by complete linkage
+
+```{r}
+#Hierarchical clustering (complete linkage)
+chem_hc_complete <- hclust(chem_euc_dist, method = "complete")
+
+#Base plot to explore
+#plot(chem_hc_complete, cex = 0.6, hang = -1)
+```
+
+### 4. Plot dendrogram with ggplot
+
+```{r}
+ggdendrogram(chem_hc_complete) +
+  theme_minimal() +
+  labs(x = "\nSite ID\n", 
+       y = " ",
+       title = "Water chemistry similarity of stream sites in Santa Barbara Coastal drainage area")
+
+```
