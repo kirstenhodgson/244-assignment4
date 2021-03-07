@@ -1,0 +1,42 @@
+---
+title: 'Task 1: Agglomerative hierarchical clustering'
+author: "Kirsten Hodgson"
+date: "3/6/2021"
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+library(NbClust)
+library(cluster)
+library(factoextra)
+library(dendextend)
+library(ggdendro)
+
+stream_chem <- read_csv(here("data", "sbc_lter_registered_stream_chemistry.csv"))
+
+stream_chem_clean <- stream_chem %>%
+  clean_names() %>%
+  na_if(-999)
+
+stream_summary <- stream_chem_clean %>% 
+  group_by(site_code) %>% 
+  summarize(mean_nh4 = mean(nh4_u_m, na.rm = T), 
+            mean_no3 = mean(no3_u_m, na.rm = T),
+            mean_po4 = mean(po4_u_m, na.rm = T),
+            mean_tdn = mean(tdn_u_m, na.rm = T),
+            mean_tdp = mean(tdp_u_m, na.rm = T),
+            mean_tpc = mean(tpc_u_m, na.rm = T),
+            mean_tpn = mean(tpn_u_m, na.rm = T),
+            mean_tpp = mean(tpp_u_m, na.rm = T),
+            mean_tss = mean(tss_mgper_liter, na.rm = T),
+            mean_spec = mean(spec_cond_u_spercm, na.rm = T)) %>% 
+  drop_na()
+```
+
