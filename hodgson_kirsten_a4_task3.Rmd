@@ -1,0 +1,26 @@
+---
+title: 'Task 3: Bootstrapping'
+author: "Kirsten Hodgson"
+date: "3/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(boot)
+```
+
+### Data preparation (vector creation)
+
+```{r}
+survey <- c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+#test <- c(1,0,1,0,1,0,0,0,0)
+
+proportion_fun <- function(x,i) {sum(x[i]/length(x[i]))}
+
+#sum(survey/length(survey))
+#proportion_fun(test)
+```
+
